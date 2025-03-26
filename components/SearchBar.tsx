@@ -14,19 +14,34 @@ const SearchBar: React.FC<SearchBarProps> = memo(
     const isWeb = Platform.OS === "web";
 
     return (
-      <View className="flex-row rounded-full px-4 py-3 shadow-sm bg-banana-100">
-        <Ionicons name="search" size={20} color="#64748b" />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "#ffff",
+          borderRadius: 50,
+          padding: 10,
+          marginHorizontal: 5,
+          width: isWeb ? 400 : "100%",
+        }}
+      >
+        <Ionicons
+          name="search"
+          size={20}
+          color="#713f12"
+          style={{ marginHorizontal: 10 }}
+        />
         <TextInput
-          className="flex-1 ml-2 text-gray-800"
+          className="flex-1 text-gray-800"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#4f3e2f"
           style={isWeb ? { outline: "none" } : {}}
         />
         {value.length > 0 && (
-          <TouchableOpacity onPress={onClear} className="p-1">
-            <Ionicons name="close-circle" size={20} color="#64748b" />
+          <TouchableOpacity onPress={onClear} style={{ marginRight: 10 }}>
+            <Ionicons name="close-circle" size={20} color="#918479" />
           </TouchableOpacity>
         )}
       </View>

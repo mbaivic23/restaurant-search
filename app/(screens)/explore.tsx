@@ -13,14 +13,12 @@ import { Restaurant } from "@/services/restaurantService";
 import RestaurantCard from "@/components/RestaurantCard";
 import SearchBar from "@/components/SearchBar";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useResponsiveColumns } from "@/hooks/useResponsiveColumns";
-
+import { useResponsive, isWeb } from "@/hooks/useResponsive";
 import { useRestaurants } from "@/hooks/useRestaurants";
 
 const ExploreScreen: React.FC = () => {
-  // state za pretragu
   const [searchInputValue, setSearchInputValue] = useState<string>("");
-  const { numColumns, isWeb } = useResponsiveColumns();
+  const { numColumns } = useResponsive();
   const debouncedSearchQuery = useDebouncedValue(searchInputValue, 200);
   const {
     restaurants,
@@ -53,7 +51,7 @@ const ExploreScreen: React.FC = () => {
     if (!loadingMore) return null;
     return (
       <View className="py-4 flex items-center justify-center">
-        <ActivityIndicator size="small" color="#0891b2" />
+        <ActivityIndicator size="small" color="#713f12" />
         <Text className="text-gray-500 mt-2">Učitavanje još restorana...</Text>
       </View>
     );
@@ -71,7 +69,7 @@ const ExploreScreen: React.FC = () => {
             </Text>
           </>
         ) : (
-          <Text className="text-gray-700 text-lg">
+          <Text className="text-gray-700 text-lg text-center mb-4">
             Nema dostupnih restorana
           </Text>
         )}
@@ -109,7 +107,7 @@ const ExploreScreen: React.FC = () => {
   if (loading && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0891b2" />
+        <ActivityIndicator size="large" color="#713f12" />
         <Text className="mt-4 text-gray-500">Učitavanje restorana...</Text>
       </View>
     );
@@ -117,9 +115,9 @@ const ExploreScreen: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <View className="px-4 py-4">
-        <Text className="text-2xl font-extrabold text-banana-800 mb-4 text-center sm:text-left">
-          Istraži restorane
+      <View className="px-4 py-4 sm:flex-row justify-between items-center">
+        <Text className="text-2xl font-extrabold text-banana-800 mb-5 text-center sm:text-left sm:ml-5 sm:mb-0">
+          Istraži Restorane
         </Text>
         <SearchBar
           value={searchInputValue}
@@ -141,7 +139,7 @@ const ExploreScreen: React.FC = () => {
         </View>
       ) : (
         <FlatList
-          className="mb-14 sm:mb-5"
+          style={{ marginBottom: isWeb ? 45 : 70 }}
           data={restaurants}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

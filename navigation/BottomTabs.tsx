@@ -2,19 +2,19 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-const isWeb = typeof document !== "undefined";
+import { useResponsive, isWeb } from "@/hooks/useResponsive";
 
-function NavigationIcon({ focused, icon, title }: any) {
+function NavigationIcon({ focused, icon, title, smScreen }: any) {
   return (
     <View
       className={`flex-row items-center justify-center ${
         focused ? "bg-banana-300" : ""
       } ${isWeb ? "cursor-pointer" : ""}`}
       style={{
-        minWidth: focused ? 180 : 50,
+        minWidth: focused ? 200 : 50,
         minHeight: 60,
         borderRadius: 50,
-        marginBottom: isWeb ? 0 : -20,
+        marginBottom: (!smScreen && !isWeb) ? 0 : -20,
       }}
     >
       <Ionicons name={icon} size={24} color={focused ? "#713f12" : "#a78b71"} />
@@ -31,6 +31,9 @@ function NavigationIcon({ focused, icon, title }: any) {
 }
 
 const BottomTabs = () => {
+  const { smScreen } = useResponsive();
+  const { lgScreen } = useResponsive();
+
   return (
     <Tabs
       screenOptions={{
@@ -44,6 +47,7 @@ const BottomTabs = () => {
           overflow: "hidden",
           borderWidth: 1,
           borderColor: "#fef9c3",
+          marginBottom: isWeb && smScreen ? 20 : 0,
         },
       }}
     >
@@ -53,7 +57,12 @@ const BottomTabs = () => {
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <NavigationIcon focused={focused} icon="home" title="Home" />
+            <NavigationIcon
+              focused={focused}
+              icon="home"
+              title="Home"
+              smScreen={smScreen}
+            />
           ),
         }}
       />
@@ -63,7 +72,12 @@ const BottomTabs = () => {
           title: "Explore",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <NavigationIcon focused={focused} icon="navigate" title="Explore" />
+            <NavigationIcon
+              focused={focused}
+              icon="navigate"
+              title="Explore"
+              smScreen={smScreen}
+            />
           ),
         }}
       />
