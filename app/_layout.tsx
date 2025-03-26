@@ -4,7 +4,7 @@ import { StatusBar } from "react-native";
 export default function RootLayout() {
   return (
     <>
-      <StatusBar />
+      <StatusBar/>
       <Stack>
         <Stack.Screen name="(screens)" options={{ headerShown: false }} />
       </Stack>
