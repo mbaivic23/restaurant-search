@@ -32,7 +32,6 @@ function NavigationIcon({ focused, icon, title, smScreen }: any) {
 
 const BottomTabs = () => {
   const { smScreen } = useResponsive();
-  const { lgScreen } = useResponsive();
 
   return (
     <Tabs
