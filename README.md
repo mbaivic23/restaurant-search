@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# React Native (Expo) App - Restaurants
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple React Native app built with **Expo** to display a list of restaurants with search and lazy loading functionality. The app uses **NativeWind** for styling and is organized for scalability.
 
-## Get started
+---
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### Navigation
+- **Bottom Tab Navigation** with:
+  - **Home**: Currently empty.
+  - **Explore**: Displays a list of restaurants.
 
-2. Start the app
+### Explore Screen
+1. **Search**: 
+   - Search input at the top of the screen.
+   - Fetches and displays results immediately after typing.
 
-   ```bash
-    npx expo start
-   ```
+2. **Lazy Loading**:
+   - Loads the first page of results initially.
+   - Fetches the next page when scrolling to the bottom.
 
-In the output, you'll find options to open the app in a
+3. **Restaurant Display**:
+   - Shows restaurant image, name, rating, and number of reviews.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Technologies
 
-## Get a fresh project
+- **React Native** (Expo)
+- **NativeWind** for styling
+- **Axios** for API calls
 
-When you're ready, run:
+---
 
+## Installation
+
+1. Clone the repository:
 ```bash
-npm run reset-project
+git clone git@github.com:mbaivic23/restaurant-search.git
+cd restaurant-search
+ ```
+   
+Install dependencies:
+```bash
+npm install
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Start the app:
+```bash
+expo start
+```
