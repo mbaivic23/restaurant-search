@@ -1,13 +1,18 @@
 import axios from "axios";
-//postavljanje axios instance
+const isWeb = typeof document !== "undefined";
+const baseURL = isWeb
+  ? "https://thingproxy.freeboard.io/fetch/https://api.dinver.eu/api/app" // proxy za web
+  : "https://api.dinver.eu/api/app"; // direktni URL za native
+
+// postavljanje axios instance
 const api = axios.create({
-  baseURL: "https://api.dinver.eu/api/app",
+  baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
-//dodavanje interceptora za odgovore
+// dodavanje interceptora za odgovore
 api.interceptors.response.use(
   (response) => response,
   (error) => {
