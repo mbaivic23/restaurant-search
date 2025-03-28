@@ -34,7 +34,7 @@ export default function BottomTab() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: "Početna",
           tabBarIcon: ({ color, focused }) => (
@@ -77,7 +77,6 @@ export default function BottomTab() {
             </View>
           ),
         }}
-      
       />
     </Tabs>
   );

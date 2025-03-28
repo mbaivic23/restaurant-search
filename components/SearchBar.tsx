@@ -13,10 +13,6 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = memo(
   ({ value, onChangeText, onClear, placeholder = "Search..." }) => {
     const isWeb = Platform.OS === "web";
-    
-    // Theme boje
-    const backgroundColor = useThemeColor({}, "background");
-    const textColor = useThemeColor({}, "text");
     const iconColor = useThemeColor({}, "tint");
     const placeholderColor = useThemeColor({}, "icon");
     
@@ -28,7 +24,6 @@ const SearchBar: React.FC<SearchBarProps> = memo(
           backgroundColor: useThemeColor({ light: "#f4f4f5", dark: "#3f3f46" }, "background"),
           borderRadius: 50,
           padding: 10,
-          marginHorizontal: 5,
           width: isWeb ? 400 : "100%",
           borderWidth: 1,
           borderColor: useThemeColor({ light: "#e4e4e7", dark: "#52525b" }, "background"),

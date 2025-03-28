@@ -13,14 +13,13 @@ import { Restaurant } from "@/services/restaurantService";
 import RestaurantCard from "@/components/RestaurantCard";
 import SearchBar from "@/components/SearchBar";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useResponsive, isWeb } from "@/hooks/useResponsive";
+import { useResponsive } from "@/hooks/useResponsive";
 import { useRestaurants } from "@/hooks/useRestaurants";
 import { ThemedView } from "@/components/ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { Ionicons } from "@expo/vector-icons";
 
 const ExploreScreen: React.FC = () => {
-  // State i hooks
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const { numColumns } = useResponsive();
   const debouncedSearchQuery = useDebouncedValue(searchInputValue, 200);
@@ -36,7 +35,6 @@ const ExploreScreen: React.FC = () => {
   } = useRestaurants(debouncedSearchQuery);
 
   const primaryColor = useThemeColor({}, "tint");
-  const textColor = useThemeColor({}, "text");
   const secondaryTextColor = useThemeColor({}, "icon");
 
   useEffect(() => {
@@ -133,9 +131,9 @@ const ExploreScreen: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ThemedView className="flex-1">
-        <View className="px-4 py-4 sm:py-6 sm:flex-row justify-between items-center">
-          <Text className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 mb-5 text-center sm:text-left sm:mb-0">
+      <ThemedView>
+        <View className="p-6 sm:flex-row justify-between items-center]">
+          <Text className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-5 text-center sm:text-left sm:mb-0">
             Istraži Restorane
           </Text>
           <SearchBar
@@ -160,29 +158,31 @@ const ExploreScreen: React.FC = () => {
             </TouchableOpacity>
           </ThemedView>
         ) : (
-          <FlatList
-            data={restaurants}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            numColumns={numColumns}
-            key={`column-${numColumns}`}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-                colors={[primaryColor]}
-                tintColor={primaryColor}
-              />
-            }
-            ListEmptyComponent={ListEmptyComponent}
-            ListFooterComponent={ListFooterComponent}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.3}
-            removeClippedSubviews={true}
-            maxToRenderPerBatch={10}
-            windowSize={10}
-            initialNumToRender={8}
-          />
+          <View className="mx-4">
+            <FlatList
+              data={restaurants}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              numColumns={numColumns}
+              key={`column-${numColumns}`}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                  colors={[primaryColor]}
+                  tintColor={primaryColor}
+                />
+              }
+              ListEmptyComponent={ListEmptyComponent}
+              ListFooterComponent={ListFooterComponent}
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.3}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={10}
+              initialNumToRender={8}
+            />
+          </View>
         )}
       </ThemedView>
     </SafeAreaView>

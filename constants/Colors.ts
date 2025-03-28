@@ -1,6 +1,5 @@
-// Constants/Colors.ts
-const tintColorLight = "#0891b2"; // Cyan-600 - glavna boja za light mode
-const tintColorDark = "#22d3ee"; // Cyan-400 - glavna boja za dark mode
+const tintColorLight = "#0891b2"; // Cyan-600
+const tintColorDark = "#22d3ee"; // Cyan-400
 
 export const Colors = {
   light: {

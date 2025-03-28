@@ -6,6 +6,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeContext";
 import { Colors } from "@/constants/Colors";
 import { WebThemeSync } from "@/components/WebThemeSync";
+import { AuthProvider } from "@/context/AuthContext";
 
 function ThemedSafeArea({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
@@ -31,11 +32,13 @@ function AppLayout() {
   return (
     <ThemeProvider>
       <WebThemeSync />
-      <ThemedSafeArea>
-        <Stack>
-          <Stack.Screen name="(screens)" options={{ headerShown: false }} />
-        </Stack>
-      </ThemedSafeArea>
+      <AuthProvider>
+        <ThemedSafeArea>
+          <Stack>
+            <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+          </Stack>
+        </ThemedSafeArea>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
