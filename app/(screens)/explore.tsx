@@ -33,7 +33,6 @@ const ExploreScreen: React.FC = () => {
     handleLoadMore,
     handleRefresh,
   } = useRestaurants(debouncedSearchQuery);
-
   const primaryColor = useThemeColor({}, "tint");
   const secondaryTextColor = useThemeColor({}, "icon");
 
@@ -131,8 +130,8 @@ const ExploreScreen: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ThemedView>
-        <View className="p-6 sm:flex-row justify-between items-center]">
+      <ThemedView className="flex-1">
+        <View className="p-6 sm:flex-row sm:items-center sm:justify-between">
           <Text className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-5 text-center sm:text-left sm:mb-0">
             Istraži Restorane
           </Text>
@@ -143,7 +142,6 @@ const ExploreScreen: React.FC = () => {
             placeholder="Pretraži restorane..."
           />
         </View>
-
         {error ? (
           <ThemedView className="flex-1 justify-center items-center p-4">
             <Ionicons name="warning-outline" size={48} color="#EF4444" />
@@ -158,7 +156,7 @@ const ExploreScreen: React.FC = () => {
             </TouchableOpacity>
           </ThemedView>
         ) : (
-          <View className="mx-4">
+          <View className="flex-1 mx-4">
             <FlatList
               data={restaurants}
               keyExtractor={keyExtractor}
@@ -181,6 +179,7 @@ const ExploreScreen: React.FC = () => {
               maxToRenderPerBatch={10}
               windowSize={10}
               initialNumToRender={8}
+              contentContainerStyle={{ paddingBottom: 20 }}
             />
           </View>
         )}
