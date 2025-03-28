@@ -15,8 +15,12 @@ import SearchBar from "@/components/SearchBar";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useResponsive, isWeb } from "@/hooks/useResponsive";
 import { useRestaurants } from "@/hooks/useRestaurants";
+import { ThemedView } from "@/components/ThemedView";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { Ionicons } from "@expo/vector-icons";
 
 const ExploreScreen: React.FC = () => {
+  // State i hooks
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const { numColumns } = useResponsive();
   const debouncedSearchQuery = useDebouncedValue(searchInputValue, 200);
@@ -31,66 +35,77 @@ const ExploreScreen: React.FC = () => {
     handleRefresh,
   } = useRestaurants(debouncedSearchQuery);
 
-  // ucitaj restorane kada se promijeni debouncedSearchQuery
+  const primaryColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "text");
+  const secondaryTextColor = useThemeColor({}, "icon");
+
   useEffect(() => {
     loadRestaurants(1, true, debouncedSearchQuery);
   }, [debouncedSearchQuery, loadRestaurants]);
 
-  // funkcija za promjenu teksta pretrage
   const handleSearchInputChange = useCallback((text: string): void => {
     setSearchInputValue(text);
   }, []);
 
-  // funkcija za brisanje pretrage
   const handleClearSearch = useCallback((): void => {
     setSearchInputValue("");
   }, []);
 
-  // footer za lazy loading
   const ListFooterComponent = useMemo(() => {
     if (!loadingMore) return null;
     return (
       <View className="py-4 flex items-center justify-center">
-        <ActivityIndicator size="small" color="#713f12" />
-        <Text className="text-gray-500 mt-2">Učitavanje još restorana...</Text>
+        <ActivityIndicator size="small" color={primaryColor} />
+        <Text className="text-zinc-500 dark:text-zinc-400 mt-2">
+          Učitavanje još restorana...
+        </Text>
       </View>
     );
-  }, [loadingMore]);
+  }, [loadingMore, primaryColor]);
 
-  // komponenta za prazno stanje
   const ListEmptyComponent = useMemo(() => {
     if (loading) return null;
     return (
-      <View className="flex-1 justify-center items-center p-8">
+      <ThemedView className="flex-1 justify-center items-center p-8">
         {debouncedSearchQuery ? (
-          <>
-            <Text className="text-gray-700 text-lg text-center mb-4">
-              Nema rezultata
+          <View className="items-center">
+            <Ionicons
+              name="search-outline"
+              size={48}
+              color={secondaryTextColor}
+            />
+            <Text className="text-zinc-700 dark:text-zinc-300 text-lg text-center mt-4">
+              Nema rezultata za "{debouncedSearchQuery}"
             </Text>
-          </>
+            <TouchableOpacity
+              className="mt-4 bg-zinc-200 dark:bg-zinc-700 px-4 py-2 rounded-full"
+              onPress={handleClearSearch}
+            >
+              <Text className="text-zinc-800 dark:text-zinc-200 font-medium">
+                Očisti pretragu
+              </Text>
+            </TouchableOpacity>
+          </View>
         ) : (
-          <Text className="text-gray-700 text-lg text-center mb-4">
-            Nema dostupnih restorana
-          </Text>
+          <View className="items-center">
+            <Ionicons
+              name="restaurant-outline"
+              size={48}
+              color={secondaryTextColor}
+            />
+            <Text className="text-zinc-700 dark:text-zinc-300 text-lg text-center mt-4">
+              Nema dostupnih restorana
+            </Text>
+          </View>
         )}
-      </View>
+      </ThemedView>
     );
-  }, [loading, debouncedSearchQuery]);
+  }, [loading, debouncedSearchQuery, secondaryTextColor, handleClearSearch]);
 
-  // stil za container
-  const contentContainerStyle = useMemo(
-    () => ({
-      paddingVertical: 16,
-      paddingHorizontal: isWeb ? 8 : 0,
-    }),
-    [isWeb]
-  );
-
-  // renderer za stavke liste
   const renderItem: ListRenderItem<Restaurant> = useCallback(
     ({ item }) => (
       <View
-        className={`px-4 py-2 ${
+        className={`px-2 py-2 ${
           numColumns === 3 ? "w-1/3" : numColumns === 2 ? "w-1/2" : "w-full"
         }`}
       >
@@ -100,69 +115,76 @@ const ExploreScreen: React.FC = () => {
     [numColumns]
   );
 
-  // keyExtractor za FlatList
-  const keyExtractor = useCallback((item: Restaurant) => item.id, []);
+  const keyExtractor = useCallback(
+    (item: Restaurant) => item.id.toString(),
+    []
+  );
 
-  // prikaz stanja ucitavanja
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#713f12" />
-        <Text className="mt-4 text-gray-500">Učitavanje restorana...</Text>
-      </View>
+      <ThemedView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color={primaryColor} />
+        <Text className="mt-4 text-zinc-600 dark:text-zinc-400">
+          Učitavanje restorana...
+        </Text>
+      </ThemedView>
     );
   }
 
   return (
     <SafeAreaView className="flex-1">
-      <View className="px-4 py-4 sm:flex-row justify-between items-center">
-        <Text className="text-2xl font-extrabold text-banana-800 mb-5 text-center sm:text-left sm:ml-5 sm:mb-0">
-          Istraži Restorane
-        </Text>
-        <SearchBar
-          value={searchInputValue}
-          onChangeText={handleSearchInputChange}
-          onClear={handleClearSearch}
-          placeholder="Pretraži restorane..."
-        />
-      </View>
-
-      {error ? (
-        <View className="flex-1 justify-center items-center p-4">
-          <Text className="text-red-500 mb-4">{error}</Text>
-          <TouchableOpacity
-            className="bg-banana-300 px-4 py-2 rounded-lg"
-            onPress={() => loadRestaurants(1)}
-          >
-            <Text className="text-black font-medium">Pokušaj ponovno</Text>
-          </TouchableOpacity>
+      <ThemedView className="flex-1">
+        <View className="px-4 py-4 sm:py-6 sm:flex-row justify-between items-center">
+          <Text className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 mb-5 text-center sm:text-left sm:mb-0">
+            Istraži Restorane
+          </Text>
+          <SearchBar
+            value={searchInputValue}
+            onChangeText={handleSearchInputChange}
+            onClear={handleClearSearch}
+            placeholder="Pretraži restorane..."
+          />
         </View>
-      ) : (
-        <FlatList
-          style={{ marginBottom: isWeb ? 45 : 70 }}
-          data={restaurants}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          numColumns={numColumns}
-          key={`column-${numColumns}`}
-          contentContainerStyle={contentContainerStyle}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={["#0891b2"]}
-            />
-          }
-          ListEmptyComponent={ListEmptyComponent}
-          ListFooterComponent={ListFooterComponent}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          windowSize={10}
-          initialNumToRender={8}
-        />
-      )}
+
+        {error ? (
+          <ThemedView className="flex-1 justify-center items-center p-4">
+            <Ionicons name="warning-outline" size={48} color="#EF4444" />
+            <Text className="text-red-500 mt-4 mb-4 text-center">{error}</Text>
+            <TouchableOpacity
+              className="bg-zinc-200 dark:bg-zinc-700 px-6 py-3 rounded-full"
+              onPress={() => loadRestaurants(1)}
+            >
+              <Text className="text-zinc-800 dark:text-zinc-200 font-medium">
+                Pokušaj ponovno
+              </Text>
+            </TouchableOpacity>
+          </ThemedView>
+        ) : (
+          <FlatList
+            data={restaurants}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+            numColumns={numColumns}
+            key={`column-${numColumns}`}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                colors={[primaryColor]}
+                tintColor={primaryColor}
+              />
+            }
+            ListEmptyComponent={ListEmptyComponent}
+            ListFooterComponent={ListFooterComponent}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.3}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={10}
+            windowSize={10}
+            initialNumToRender={8}
+          />
+        )}
+      </ThemedView>
     </SafeAreaView>
   );
 };

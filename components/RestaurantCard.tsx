@@ -1,46 +1,60 @@
 import React from "react";
-import { View, Text, ImageBackground } from "react-native";
+import { View, Text, ImageBackground, StyleSheet } from "react-native";
 import { Restaurant } from "@/services/restaurantService";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useThemeColor } from "@/hooks/useThemeColor";
 interface RestaurantCardProps {
   restaurant: Restaurant;
 }
 
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
   const imageURL = restaurant.icon_url;
+  const backgroundColor = useThemeColor(
+    { light: "#f4f4f5", dark: "#3f3f46" }, 
+    "background"
+  );
+  const cardBorderColor = useThemeColor(
+    { light: "#e4e4e7", dark: "#52525b" }, 
+    "background"
+  );
+
+  const renderPriceLevel = () => {
+    if (restaurant.price_level === null || restaurant.price_level === undefined) {
+      return null;
+    }
+    
+    const priceColor = useThemeColor(
+      { light: "#059669", dark: "#10b981" }, 
+      "tint"
+    );
+    
+    return (
+      <View className="bg-zinc-200 dark:bg-zinc-700 px-2 py-1 rounded-full">
+        <Text style={{ color: priceColor }}>
+          {"$".repeat(restaurant.price_level)}
+        </Text>
+      </View>
+    );
+  };
 
   return (
-    <View
-      style={{ backgroundColor: "white", borderRadius: 20, overflow: "hidden" }}
-    >
+    <View style={[
+      styles.container,
+      { 
+        backgroundColor,
+        borderColor: cardBorderColor,
+      }
+    ]}>
       <ImageBackground
+        className="h-48 w-full"
         source={{ uri: imageURL }}
         resizeMode="cover"
-        style={{ height: 180 }}
+        style={styles.image}
       >
         {restaurant.rating !== null && restaurant.rating !== undefined && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: 10,
-              right: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-              borderRadius: 10,
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-            }}
-          >
+          <View className="absolute bottom-4 right-4 flex-row items-center bg-black bg-opacity-60 rounded-xl px-2 py-1">
             <Ionicons name="star" color="#FFD700" size={16} />
-            <Text
-              style={{
-                color: "white",
-                fontSize: 14,
-                marginLeft: 4,
-              }}
-            >
+            <Text className="text-white text-base ml-1">
               {restaurant.rating?.toFixed(1)}{" "}
               {restaurant.user_ratings_total
                 ? `(${restaurant.user_ratings_total})`
@@ -49,26 +63,54 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           </View>
         )}
       </ImageBackground>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: 15,
-          paddingHorizontal: 20,
-        }}
-      >
-        <View className="flex-col">
-          <Text className="text-lg font-bold text-gray-900 mb-1">
+      <View className="p-4">
+        <View className="flex-row justify-between items-center mb-2">
+          <Text 
+            className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
+            numberOfLines={1}
+            style={{ flex: 1 }}
+          >
             {restaurant.name}
           </Text>
-          <Text className="text-base text-gray-500">{restaurant.address}</Text>
+          {renderPriceLevel()}
         </View>
-        {restaurant.price_level !== null ? (
-          <Text>{"$".repeat(restaurant.price_level)}</Text>
-        ) : null}
+        
+        <View className="flex-row items-center">
+          <Ionicons 
+            name="location" 
+            size={16} 
+            color={useThemeColor({}, "icon")} 
+            style={{ marginRight: 4 }}
+          />
+          <Text 
+            className="text-zinc-500 dark:text-zinc-400"
+            numberOfLines={1}
+            style={{ flex: 1 }}
+          >
+            {restaurant.address}
+          </Text>
+        </View>
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  image: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden'
+  }
+});
+
 export default RestaurantCard;

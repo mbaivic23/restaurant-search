@@ -1,12 +1,13 @@
-import BottomTabs from "@/navigation/BottomTabs";
+import BottomTabs from "@/components/BottomTabs";
+import { ThemedView } from "@/components/ThemedView";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const ScreensLayout = () => {
+
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <BottomTabs />
-    </SafeAreaView>
+      <ThemedView className="flex-1">
+        <BottomTabs />
+      </ThemedView>
   );
 };
 
