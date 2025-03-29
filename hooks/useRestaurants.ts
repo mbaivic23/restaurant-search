@@ -1,8 +1,27 @@
 import { useState, useCallback, useEffect } from "react";
 import { fetchRestaurants, Restaurant } from "@/services/restaurantService";
-
-// dohvacanje i upravljanje restoranima
-export function useRestaurants(searchQuery: string = "") {
+import { z } from "zod";
+const searchQuerySchema = z.string().max(100, "Pretraga je preduga").optional();
+interface RestaurantsState {
+  restaurants: Restaurant[];
+  loading: boolean;
+  loadingMore: boolean;
+  refreshing: boolean;
+  error: string | null;
+  currentPage: number;
+  totalPages: number;
+}
+interface UseRestaurantsReturn extends RestaurantsState {
+  loadRestaurants: (
+    page: number,
+    refresh?: boolean,
+    search?: string
+  ) => Promise<void>;
+  handleLoadMore: () => void;
+  handleRefresh: () => void;
+}
+export function useRestaurants(searchQuery: string = ""): UseRestaurantsReturn {
+  const validatedSearch = searchQuerySchema.parse(searchQuery);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
@@ -10,26 +29,19 @@ export function useRestaurants(searchQuery: string = "") {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-
   const loadRestaurants = useCallback(
     async (
       page: number,
       refresh: boolean = false,
-      search: string = searchQuery
+      search: string = validatedSearch || ""
     ) => {
-      // postavi odgovarajuce stanje ucitavanja
-      if (refresh) {
-        setRefreshing(true);
-      } else if (page === 1) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
-
       try {
-        const response = await fetchRestaurants(page, search);
-
-        // azuriraj listu restorana ovisno o tipu zahtjeva
+        if (refresh) setRefreshing(true);
+        else if (page === 1) setLoading(true);
+        else setLoadingMore(true);
+        const pageParam = Math.max(1, page);
+        const searchParam = search.trim();
+        const response = await fetchRestaurants(pageParam, searchParam);
         if (page === 1 || refresh) {
           setRestaurants(response.restaurants);
         } else {
@@ -38,32 +50,33 @@ export function useRestaurants(searchQuery: string = "") {
             ...response.restaurants,
           ]);
         }
-        // azuriraj informacije o paginaciji
         setCurrentPage(response.currentPage);
         setTotalPages(response.totalPages);
         setError(null);
       } catch (err) {
-        setError("Nije moguće dohvatiti restorane");
-        console.error("Error fetching restaurants:", err);
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Nije moguće dohvatiti restorane";
+        setError(errorMessage);
+        console.error("Greška pri dohvaćanju restorana:", err);
       } finally {
-        // resetiraj stanja ucitavanja
         setLoading(false);
         setLoadingMore(false);
         setRefreshing(false);
       }
     },
-    [searchQuery]
+    [validatedSearch]
   );
-  // inicijalno ucitavanje
   useEffect(() => {
     loadRestaurants(1);
   }, [loadRestaurants]);
-  // funkcija za ucitavanje vise restorana (infinite scroll)
+
   const handleLoadMore = useCallback(() => {
     if (loadingMore || currentPage >= totalPages) return;
     loadRestaurants(currentPage + 1, false);
   }, [loadingMore, currentPage, totalPages, loadRestaurants]);
-  // funkcija za osvježavanje (pull-to-refresh)
+
   const handleRefresh = useCallback(() => {
     loadRestaurants(1, true);
   }, [loadRestaurants]);

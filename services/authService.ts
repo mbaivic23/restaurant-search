@@ -1,15 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./api";
-
-export interface User {
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  language: string;
-  banned: boolean;
-}
-
+import {
+  loginSchema,
+  registerSchema,
+  userSchema,
+  LoginInput,
+  RegisterInput,
+  User,
+} from "@/utils/validation";
 export interface AuthResponse {
   message: string;
   user: User;
@@ -17,38 +15,43 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData extends LoginData {
-  firstName: string;
-  lastName: string;
-}
-export const register = async (data: RegisterData): Promise<User> => {
+export type { LoginInput as LoginData, RegisterInput as RegisterData, User };
+export const register = async (data: RegisterInput): Promise<User> => {
   try {
+    const result = registerSchema.safeParse(data);
+    if (!result.success) {
+      const errorMessages = result.error.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+      throw new Error(`Greška u validaciji: ${errorMessages}`);
+    }
     const response = await api.post<AuthResponse>("/auth/register", data);
     await AsyncStorage.setItem("accessToken", response.data.token);
     await AsyncStorage.setItem("refreshToken", response.data.refreshToken);
     await AsyncStorage.setItem("user", JSON.stringify(response.data.user));
-    // console.log("User registered:", response.data.user);
     return response.data.user;
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("Greška u registraciji :", error);
     throw error;
   }
 };
-export const login = async (data: LoginData): Promise<User> => {
+
+export const login = async (data: LoginInput): Promise<User> => {
   try {
+    const result = loginSchema.safeParse(data);
+    if (!result.success) {
+      const errorMessages = result.error.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+      throw new Error(`Greška u validaciji: ${errorMessages}`);
+    }
     const response = await api.post<AuthResponse>("/auth/login", data);
     await AsyncStorage.setItem("accessToken", response.data.token);
     await AsyncStorage.setItem("refreshToken", response.data.refreshToken);
     await AsyncStorage.setItem("user", JSON.stringify(response.data.user));
-    // console.log("User logged in:", response.data.user);
     return response.data.user;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Greška u prijavi:", error);
     throw error;
   }
 };
@@ -58,9 +61,8 @@ export const logout = async (): Promise<void> => {
     await AsyncStorage.removeItem("accessToken");
     await AsyncStorage.removeItem("refreshToken");
     await AsyncStorage.removeItem("user");
-    // console.log("User logged out");
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error("Greška u odjavi:", error);
     throw error;
   }
 };
@@ -68,10 +70,19 @@ export const logout = async (): Promise<void> => {
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
     const userJson = await AsyncStorage.getItem("user");
-    if (userJson) return JSON.parse(userJson);
-    return null;
+    if (!userJson) return null;
+    const userData = JSON.parse(userJson);
+    const result = userSchema.safeParse(userData);
+
+    if (result.success) {
+      return result.data;
+    } else {
+      console.warn("Nevažeći korisnički podaci u pohrani:", result.error);
+      await AsyncStorage.removeItem("user");
+      return null;
+    }
   } catch (error) {
-    console.error("Get current user error:", error);
+    console.error("Greška pri dohvaćanju trenutnog korisnika:", error);
     return null;
   }
 };
@@ -81,7 +92,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
     const token = await AsyncStorage.getItem("accessToken");
     return !!token;
   } catch (error) {
-    console.error("Check auth error:", error);
+    console.error("Greška pri provjeri autentifikacije:", error);
     return false;
   }
 };

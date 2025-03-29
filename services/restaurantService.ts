@@ -1,15 +1,11 @@
 import api from "./api";
+import {
+  searchParamsSchema,
+  restaurantsResponseSchema,
+  Restaurant,
+} from "@/utils/validation";
 
-export interface Restaurant {
-  id: string;
-  name: string;
-  address: string;
-  rating: number | null;
-  user_ratings_total: number | null;
-  price_level: number | null;
-  icon_url: string;
-}
-
+export type { Restaurant };
 export interface RestaurantsResponse {
   totalRestaurants: number;
   totalPages: number;
@@ -19,20 +15,33 @@ export interface RestaurantsResponse {
   fixedSampleSize: number;
   maxRecords: number;
 }
-//dohvacanje restorana
+
 export const fetchRestaurants = async (
   page: number = 1,
   search?: string
 ): Promise<RestaurantsResponse> => {
   try {
-    const params: Record<string, string | number> = { page };
-    if (search && search.trim() !== "") {
-      params.search = search.trim();
+    const paramsResult = searchParamsSchema.safeParse({ page, search });
+    const params: Record<string, string | number> = {
+      page: paramsResult.success ? paramsResult.data.page : 1,
+    };
+    if (
+      paramsResult.success &&
+      paramsResult.data.search &&
+      paramsResult.data.search.trim() !== ""
+    ) {
+      params.search = paramsResult.data.search.trim();
     }
     const response = await api.get("/restaurants/sample", { params });
-    return response.data;
+    const responseResult = restaurantsResponseSchema.safeParse(response.data);
+    if (responseResult.success) {
+      return responseResult.data;
+    } else {
+      console.warn("Nevažeći API odgovor:", responseResult.error);
+      return response.data as RestaurantsResponse;
+    }
   } catch (error) {
-    console.error("Error fetching restaurants:", error);
+    console.error("Pogreška pri dohvaćanju restorana:", error);
     throw error;
   }
 };
